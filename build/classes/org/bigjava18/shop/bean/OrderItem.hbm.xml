@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="org.bigjava18.shop.bean.OrderItem" table="orderitem">
+		<id name="itemid">
+			<generator class="native"></generator>
+		</id>
+		
+		<property name="count" column="count"></property>
+		<property name="subtotal" column="subtotal"></property>
+		
+		<!-- 配置订单项和商品的关联关系  -->
+		<many-to-one name="product" lazy="false" class="org.bigjava18.shop.bean.Product" column="pid"></many-to-one>
+		
+		<!-- 配置订单项和订单的关联关系  -->
+		<many-to-one name="order" class="org.bigjava18.shop.bean.Order" column="oid"></many-to-one>
+		
+	</class>
+</hibernate-mapping>

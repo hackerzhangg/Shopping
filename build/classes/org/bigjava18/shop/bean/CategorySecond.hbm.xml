@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="org.bigjava18.shop.bean.CategorySecond" table="categorysecond">
+		<id name="csid">
+			<generator class="native"/>
+		</id>
+		
+		<property name="csname" column="csname"/>
+		
+		<!-- 配置二级分类与一级分类的关联关系 -->
+		<many-to-one name="category" lazy="false" class="org.bigjava18.shop.bean.Category" column="cid"></many-to-one>
+		
+		<!-- 配置二级分类与商品的关联关系  -->
+		<set name="products" cascade="save-update,delete" inverse="true">
+			<key column="csid"></key>
+			<one-to-many class="org.bigjava18.shop.bean.Product"/>
+		</set>
+	</class>
+</hibernate-mapping>

@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context.xsd
+	http://www.springframework.org/schema/aop
+	http://www.springframework.org/schema/aop/spring-aop.xsd
+	http://www.springframework.org/schema/tx 
+	http://www.springframework.org/schema/tx/spring-tx.xsd">
+	
+	<!-- 配置连接池: -->
+	<!-- 引入外部属性文件 -->
+	<context:property-placeholder location="classpath:jdbc.properties"/>
+	<!-- 配置C3P0连接池: -->
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+		<property name="driverClass" value="${jdbc.driver}"/>
+		<property name="jdbcUrl" value="${jdbc.url}"/>
+		<property name="user" value="${jdbc.user}"/>
+		<property name="password" value="${jdbc.password}"/>
+	</bean>
+	
+	<!-- Hibernate的相关信息 -->
+	<bean id="sessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+		<!-- 注入连接池 -->
+		<property name="dataSource" ref="dataSource"/>
+		<!-- 配置Hibernate的其他的属性 -->
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+				<prop key="hibernate.show_sql">true</prop>
+				<prop key="hibernate.format_sql">true</prop>
+				<prop key="hibernate.connection.autocommit">false</prop>
+				<prop key="hibernate.hbm2ddl.auto">update</prop>
+			</props>
+		</property>
+		<!-- 配置Hibernate的映射文件 -->
+		<property name="mappingResources">
+			<list>
+				<!-- 配置User.hbm.xml -->
+				<value>org/bigjava18/shop/bean/User.hbm.xml</value>	
+				<!-- 配置Category.hbm.xml -->
+				<value>org/bigjava18/shop/bean/Category.hbm.xml</value>
+				<!-- 配置Product.hbm.xml -->
+				<value>org/bigjava18/shop/bean/Product.hbm.xml</value>	
+				<!-- 配置CategorySecond.hbm.xml -->	
+				<value>org/bigjava18/shop/bean/CategorySecond.hbm.xml</value>
+				<!-- 配置Order.hbm.xml -->
+				<value>org/bigjava18/shop/bean/Order.hbm.xml</value>
+				<!-- 配置OrderItem.hbm.xml -->
+				<value>org/bigjava18/shop/bean/OrderItem.hbm.xml</value>
+				<!-- 配置AdminUser.hbm.xml -->
+				<value>org/bigjava18/shop/bean/AdminUser.hbm.xml</value>
+				<!-- 配置Message.hbm.xml -->
+				<value>org/bigjava18/shop/bean/Message.hbm.xml</value>
+			</list>
+		</property>
+	</bean>
+	
+	<!-- 事务管理: -->
+	<!-- 事务管理器 -->
+	<bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	
+	<!-- 开启注解事务 -->
+	<tx:annotation-driven transaction-manager="transactionManager"/>
+	
+	<!-- Action的配置===== -->
+	
+	<!-- 配置访问首页的Action -->
+	<bean id="indexAction" class="org.bigjava18.shop.action.IndexAction" scope="prototype">
+		<!-- 在首页中配置一级分类 -->
+		<property name="categoryBiz" ref="categoryBizImpl"></property>
+		<property name="productBiz" ref="productBizImpl"></property>
+	</bean>
+	
+	<!-- 配置验证码的Action -->
+	<bean id="checkImgAction" class="org.bigjava18.shop.action.CheckImgAction" scope="prototype"></bean>
+	
+	<!-- 用户模块Action  -->
+	<bean id="userAction" class="org.bigjava18.shop.action.UserAction" scope="prototype">
+		<property name="userBiz" ref="userBizImpl"></property>
+	</bean>
+	
+	<!-- 商品模块Action -->
+	<bean id="productAction" class="org.bigjava18.shop.action.ProductAction" scope="prototype">
+		<property name="productBiz" ref="productBizImpl"></property>
+	</bean>
+	
+	<!-- 购物车模块Action -->
+	<bean id="cartAction" class="org.bigjava18.shop.action.CartAction" scope="prototype">
+		<property name="productBiz" ref="productBizImpl"></property>
+	</bean>
+	
+	<!-- 配置订单Action -->
+	<bean id="orderAction" class="org.bigjava18.shop.action.OrderAction" scope="prototype">
+		<property name="orderBiz" ref="orderBizImpl"></property>
+	</bean>
+	
+	<!-- 配置后台登录Action -->
+	<bean id="adminLoginAction" class="org.bigjava18.shop.action.AdminLoginAction" scope="prototype">
+		<property name="adminLoginBiz" ref="adminLoginBizImpl"></property>
+		<property name="userBiz" ref="userBizImpl"></property>
+		<property name="productBiz" ref="productBizImpl"></property>
+		<property name="messageBiz" ref="messageBizImpl"></property>
+	</bean>
+	
+	<!-- 配置后台管理用户Action -->
+	<bean id="adminUserAction" class="org.bigjava18.shop.action.AdminUserAction" scope="prototype">
+		<property name="userBiz" ref="userBizImpl"></property>
+	</bean>
+	
+	<!-- 配置后台管理一级分类Action -->
+	<bean id="adminCategoryAction" class="org.bigjava18.shop.action.AdminCategoryAction" scope="prototype">
+		<property name="categoryBiz" ref="categoryBizImpl"></property>
+	</bean>
+	
+	<!-- 配置后台管理二级分类Action -->
+	<bean id="adminCategorySecondAction" class="org.bigjava18.shop.action.AdminCategorySecondAction" scope="prototype">
+		<property name="categorySecondBiz" ref="categorySecondBizImpl"></property>
+		<property name="categoryBiz" ref="categoryBizImpl"></property>
+	</bean>
+	
+	<!-- 配置后台商品管理Action -->
+	<bean id="adminProductAction" class="org.bigjava18.shop.action.AdminProductAction" scope="prototype">
+		<property name="productBiz" ref="productBizImpl"></property>
+		<property name="categorySecondBiz" ref="categorySecondBizImpl"></property>
+	</bean>
+	
+	<!-- 配置后台订单管理Action -->
+	<bean id="adminOrderAction" class="org.bigjava18.shop.action.AdminOrderAction" scope="prototype">
+		<property name="orderBiz" ref="orderBizImpl"></property>
+	</bean>
+	
+	<!-- Biz的配置===== -->
+	
+	<!-- 用户模块Biz -->
+	<bean id="userBizImpl" class="org.bigjava18.shop.biz.impl.UserBizImpl">
+		<property name="userDao" ref="userDaoImpl"></property>
+	</bean>
+	
+	<!-- 一级分类模块Biz -->
+	<bean id="categoryBizImpl" class="org.bigjava18.shop.biz.impl.CategoryBizImpl">
+		<property name="categoryDao" ref="categoryDaoImpl"></property>
+	</bean>
+	
+	<!-- 商品模块Biz -->
+	<bean id="productBizImpl" class="org.bigjava18.shop.biz.impl.ProductBizImpl">
+		<property name="productDao" ref="productDaoImpl"></property>
+	</bean>
+	
+	<!-- 配置订单Biz -->
+	<bean id="orderBizImpl" class="org.bigjava18.shop.biz.impl.OrderBizImpl">
+		<property name="orderDao" ref="orderDaoImpl"></property>
+	</bean>
+	
+	<!-- 配置后台登录Biz -->
+	<bean id="adminLoginBizImpl" class="org.bigjava18.shop.biz.impl.AdminLoginBizImpl">
+		<property name="adminLoginDao" ref="adminLoginDaoImpl"></property>
+	</bean>
+	
+	<!-- 配置后台管理二级分类Biz -->
+	<bean id="categorySecondBizImpl" class="org.bigjava18.shop.biz.impl.CategorySecondBizImpl">
+		<property name="categorySecondDao" ref="categorySecondDaoImpl"></property>
+	</bean>
+	
+	<!-- 配置后台用户留言Biz -->
+	<bean id="messageBizImpl" class="org.bigjava18.shop.biz.impl.MessageBizImpl">
+		<property name="messageDao" ref="messageDaoImpl"></property>
+	</bean>
+	
+	<!-- Dao的配置===== -->
+	
+	<!-- 用户模块Dao -->
+	<bean id="userDaoImpl" class="org.bigjava18.shop.dao.impl.UserDaoImpl">
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	
+	<!-- 一级分类模块Dao -->
+	<bean id="categoryDaoImpl" class="org.bigjava18.shop.dao.impl.CategoryDaoImpl">
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	
+	<!-- 商品模块Dao -->
+	<bean id="productDaoImpl" class="org.bigjava18.shop.dao.impl.ProductDaoImpl">
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	
+	<!-- 配置订单Dao -->
+	<bean id="orderDaoImpl" class="org.bigjava18.shop.dao.impl.OrderDaoImpl">
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	
+	<!-- 配置后台登录Dao  -->
+	<bean id="adminLoginDaoImpl" class="org.bigjava18.shop.dao.impl.AdminLoginDaoImpl">
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	
+	<!-- 配置后台管理二级分类Dao -->
+	<bean id="categorySecondDaoImpl" class="org.bigjava18.shop.dao.impl.CategorySecondDaoImpl">
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	
+	<!-- 配置后台用户留言Dao -->
+	<bean id="messageDaoImpl" class="org.bigjava18.shop.dao.impl.MessageDaoImpl">
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	
+</beans>

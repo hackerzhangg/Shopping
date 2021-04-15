@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+	"-//Apache Software Foundation//DTD Struts Configuration 2.3//EN"
+	"http://struts.apache.org/dtds/struts-2.3.dtd">
+
+<struts>
+	
+	<!-- 开启使用开发模式，详细错误提示 -->
+    <constant name="struts.devMode" value="true" />
+    
+    <!-- /static 为存放后台静态资源的路径，意为不拦截对此文件夹下文件的请求  -->
+    <constant name="struts.action.excludePattern" value="/static/.*?" />
+    
+	<!-- 配置首页访问  -->
+	<package name="index" extends="struts-default" namespace="/">
+		<!-- 执行访问首页 -->
+		<action name="index" class="indexAction">
+			<result name="index">/WEB-INF/jsp/index.jsp</result>
+		</action>
+	</package>
+	
+	<!-- 配置用户访问 -->
+	<package name="user" extends="struts-default" namespace="/">
+		<action name="user_*" class="userAction" method="{1}">    	
+			<!-- 到用户注册页面  -->
+			<result name="registerPage">/WEB-INF/jsp/register.jsp</result>
+			<!-- Ajax的用户异步处理  -->
+			<result name="input">/WEB-INF/jsp/regist.jsp</result>
+			<!-- 验证码输入错误，回到注册页面  -->
+			<result name="checkCodeFailRegister">/WEB-INF/jsp/register.jsp</result>
+			<!-- 用户注册成功信息页面 -->
+			<result name="msg">/WEB-INF/jsp/msg.jsp</result>
+			<!-- 用户激活成功信息页面 -->
+			<result name="msgActive">/WEB-INF/jsp/msg.jsp</result>
+			<!-- 到用户登录页面  -->
+			<result name="loginPage">/WEB-INF/jsp/login.jsp</result>
+			<!-- 登录失败，到用户登录页面 -->
+			<result name="login">/WEB-INF/jsp/login.jsp</result>
+			<!-- 登录成功，到首页面 -->
+			<result name="loginSuccess" type="redirectAction">index</result>
+			<!-- 验证码输入错误，回到登录页面  -->
+			<result name="checkCodeFailLogin">/WEB-INF/jsp/login.jsp</result>
+			<!-- 用户退出登录  -->
+			<result name="userQuit" type="redirectAction">index</result>
+			<!-- 通过用户uid查询用户失败，回到首页 -->
+			<result name="NofindUser" type="redirectAction">index</result>
+			<!-- 通过用户uid查询用户成功，到修改信息页面 -->
+			<result name="updateUserInformationPage">/WEB-INF/jsp/update.jsp</result>			
+			<!-- 用户更新成功：未修改邮箱  -->
+			<!-- <result name="updateUserDataSuccess" type="redirectAction">user_loginPage</result> -->
+			<result name="updateUserDataSuccess" type="redirectAction">index</result>
+			<!-- 用户更新成功：邮箱修改  -->
+			<result name="updateUserMsg">/WEB-INF/jsp/msg.jsp</result>
+		</action>
+	</package>
+	
+	<!-- 配置验证码 -->
+	<package name="checkImg" extends="struts-default" namespace="/">
+		<!-- 验证码Action -->
+		<action name="checkImg" class="checkImgAction"></action>		
+	</package>
+	
+	<!-- 配置商品模块 -->
+	<package name="product" extends="struts-default" namespace="/">
+		<action name="product_*" class="productAction" method="{1}">
+			<!-- 到商品的详情页面 -->
+			<result name="findByPid">/WEB-INF/jsp/productDetails.jsp</result>
+			<!-- 一级分类到商品列表页面 -->
+			<result name="findByCid">/WEB-INF/jsp/productList.jsp</result>
+			<!-- 二级分类到商品列表页面 -->
+			<result name="findByCsid">/WEB-INF/jsp/productList.jsp</result>
+			<!-- 模糊查询商品列表页面 -->
+			<result name="findConditionProduct">/WEB-INF/jsp/FqProduct.jsp</result>
+		</action>
+	</package>
+	
+	<!-- 配置购物车模块 -->
+	<package name="cart" extends="struts-default" namespace="/">
+		<action name="cart_*" class="cartAction" method="{1}">
+			<!-- 添加购物车  -->
+			<result name="addCart">/WEB-INF/jsp/cart.jsp</result>
+			<!-- 移除购物车  -->
+			<result name="removeCart">/WEB-INF/jsp/cart.jsp</result>
+			<!-- 清空购物车  -->
+			<result name="clearCart">/WEB-INF/jsp/cart.jsp</result>
+			<!-- 到购物车页面 -->
+			<result name="MyCart">/WEB-INF/jsp/cart.jsp</result>
+		</action>
+	</package>
+	
+	<!-- 配置订单模块 -->
+	<package name="order" extends="struts-default" namespace="/">
+		<action name="order_*" class="orderAction" method="{1}">
+			<!-- 保存订单并到订单页面  -->
+			<result name="saveOrderPage">/WEB-INF/jsp/order.jsp</result>
+			<!-- 提交订单购物车为空  -->
+			<result name="cartMsg">/WEB-INF/jsp/msg/jsp</result>
+			<!-- 提交订单用户未登录  -->
+			<result name="userMsg">/WEB-INF/jsp/msg.jsp</result>
+			<!-- 用户订单列表页面  -->
+			<result name="findByUid">/WEB-INF/jsp/orderList.jsp</result>
+			<!-- 根据订单的oid查询订单  -->
+			<result name="findByOid">/WEB-INF/jsp/order.jsp</result>
+			<!-- 订单付款页面  -->
+			<result name="payOrderPage">/WEB-INF/jsp/orderPay.jsp</result>
+			<!-- 修改订单状态，回到订单列表页面 -->
+			<result name="updateState" type="redirectAction">order_findByUid.action?page=1</result>
+			<!-- 订单支付成功，回到订单列表页面  -->
+			<result name="callBackPage" type="redirectAction">order_findByUid.action?page=1</result>
+		</action>
+	</package>
+		
+	<!-- 后台管理员登录模块 -->
+	<package name="adminLogin" extends="struts-default" namespace="/">
+		<action name="admin_*" class="adminLoginAction" method="{1}">
+			<!-- 到后台用户登录页面  -->
+			<result name="adminUserLoginPage">admin/index/adminUser/login.jsp</result>
+			<!-- 管理员登录失败，回到登录页面  -->
+			<result name="adminFile">admin/index/adminUser/login.jsp</result>
+			<!-- 管理员登录成功，到后台首页  -->
+			<!-- <result name="adminLogin">admin/adminUser/index.jsp</result> -->
+			<result name="adminLogin" type="redirect" >admin/index/index.jsp</result>
+			<!-- 管理员信息页面  -->
+			<result name="adminInfoPage">/admin/index/adminUser/adminUserInfo.jsp</result>
+			<!-- 管理员信息更新成功，回到登录页面  -->
+			<result name="updateAdminUser" type="redirect">admin/index/adminUser/login.jsp</result>
+			<!-- 管理员退出登录  -->
+			<result name="adminQuitLogin">admin/index/adminUser/login.jsp</result>
+		</action>
+	</package>
+	
+	<!-- 后台管理用户模块 -->
+	<package name="adminUser" extends="struts-default" namespace="/">		
+		<action name="adminUser_*" class="adminUserAction" method="{1}">
+			<!-- 到用户列表页面 -->
+			<result name="userListPage">/admin/index/user/userList.jsp</result>
+			<!-- 到用户更新页面 -->
+			<result name="updateUserPage">/admin/index/user/updateUser.jsp</result>
+			<!-- 用户更新成功，回到列表页面  -->
+			<result name="updateUser" type="redirectAction">adminUser_userListPage.action?page=1</result>
+			<!-- 删除用户，回到列表页面  -->
+			<result name="deleteUser" type="redirectAction">adminUser_userListPage.action?page=1</result>
+		</action>		
+	</package>
+		
+	<!-- 后台管理一级分类模块 -->
+	<package name="adminCategory" extends="struts-default" namespace="/">
+		<action name="adminCategory_*" class="adminCategoryAction" method="{1}">
+			<!-- 后台到一级分类的列表页面  -->
+			<result name="categoryListPage">/admin/index/category/categoryList.jsp</result>
+			<!-- 后台一级分类的更新页面 -->
+			<result name="updateCategoryPage">/admin/index/category/updateCategory.jsp</result>
+			<!-- 更新一级分类成功，回到列表页面  -->
+			<result name="updateCategory" type="redirectAction">adminCategory_categoryListPage.action</result>
+			<!-- 到添加一级分类页面  -->
+			<result name="addCategoryPage">/admin/index/category/addCategory.jsp</result>
+			<!-- 添加一级分类，回到列表页面   -->
+			<result name="addCategory" type="redirectAction">adminCategory_categoryListPage.action</result>
+			<!-- 删除一级分类，回到列表页面 -->
+			<result name="deleteCategory" type="redirectAction">adminCategory_categoryListPage.action</result>
+			<!-- 模糊查询一级分类到页面 -->
+			<result name="findCondition">/admin/index/category/categoryList.jsp</result>
+		</action>
+	</package>
+	
+	<!-- 后台管理二级分类模块 -->
+	<package name="adminCategorySecond" extends="struts-default" namespace="/">
+		<action name="adminCategorySecond_*" class="adminCategorySecondAction" method="{1}">
+			<!-- 后台到二级分类列表页面  -->
+			<result name="csListPage">/admin/index/categorySecond/categorySecondList.jsp</result>
+			<!-- 后台到二级分类的更新页面 -->
+			<result name="csUpdatePage">/admin/index/categorySecond/updateCategorySecond.jsp</result>
+			<!-- 更新成功，回到列表页面 -->
+			<result name="csUpdate" type="redirectAction">adminCategorySecond_csListPage.action?page=1</result>
+			<!-- 到添加二级分类页面  -->
+			<result name="addCsPage">/admin/index/categorySecond/addCategorySecond.jsp</result>
+			<!-- 添加二级分类，回到列表页面  -->
+			<result name="saveCsData" type="redirectAction">adminCategorySecond_csListPage.action?page=1</result>
+			<!-- 删除二级分类，回到列表页面 -->
+			<result name="deleteCategorySecond" type="redirectAction">adminCategorySecond_csListPage.action?page=1</result>
+		</action>
+	</package>
+	
+	<!-- 后台管理商品模块 -->
+	<package name="adminProduct" extends="struts-default" namespace="/">
+		<action name="adminProduct_*" class="adminProductAction" method="{1}">
+			<!-- 到商品列表页面  -->
+			<result name="productListPage">/admin/index/product/productList.jsp</result>
+			<!-- 到更新商品页面  -->
+			<result name="updateProductPage">/admin/index/product/updateProduct.jsp</result>
+			<!-- 更新成功,回到商品列表页面 -->
+			<result name="updateProduct" type="redirectAction">adminProduct_productListPage.action?page=1</result>
+			<!-- 到添加商品的页面  -->
+			<result name="addProductPage">/admin/index/product/addProduct.jsp</result>
+			<!-- 添加商品成功，回到列表页面  -->
+			<result name="saveProduct" type="redirectAction">adminProduct_productListPage.action?page=1</result>
+			<!-- 删除商品，回到列表页面  -->
+			<result name="deleteProduct" type="redirectAction">adminProduct_productListPage.action?page=1</result>
+		</action>
+	</package>
+	
+	<!-- 后台订单模块  -->
+	<package name="adminOrder" extends="struts-default" namespace="/">
+		<action name="adminOrder_*" class="adminOrderAction" method="{1}">
+			<!-- 到订单列表页面 -->
+			<result name="orderListPage">/admin/index/order/orderList.jsp</result>
+			<!-- 到订单项列表  -->
+			<result name="findByOrderItem">admin/index/order/orderItems.jsp</result>
+			<!-- 更新订单的状态，回到订单列表页面  -->
+			<result name="updateOrderState" type="redirectAction">adminOrder_orderListPage.action?page=1</result>
+			<!-- 根据用户的订单oid删除订单  -->
+			<result name="deleteUserOrder" type="redirectAction">adminOrder_orderListPage.action?page=1</result>
+		</action>
+	</package>
+	
+</struts>
